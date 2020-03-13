@@ -4,11 +4,10 @@ public abstract class Actor {
     private int power = 1;
     private int defense = 1;
     private int[] position = new int[]{0, 0};
+    private int[] nextPosition = new int[]{0, 0};
 
-    abstract void move();
-    public void loseHealth(int dmg){
-        currHealth = currHealth + defense <= dmg ? 0 : currHealth + defense - dmg;
-    };
+
+    abstract void loseHealth(int dmg);
     public void gainHealth(int heal){
         currHealth = currHealth + heal >= maxHealth ? maxHealth : currHealth + heal;
     };
@@ -41,5 +40,11 @@ public abstract class Actor {
     }
     public void setPosition(int[] position) {
         this.position = position;
+    }
+    public int[] getNextPosition() {
+        return nextPosition;
+    }
+    public void setNextPosition(int[] nextPosition) {
+        this.nextPosition = nextPosition;
     }
 }
