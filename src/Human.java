@@ -9,7 +9,7 @@ private int modifiedDefense;
         this.setCurrHealth(25);
         this.setPower(5);
         this.modifiedPower = getPower();
-        this.setDefense(1);
+        this.setDefense(0);
         this.modifiedDefense = getDefense();
         this.setPosition(new int[]{0, 2});
         this.setNextPosition(new int[]{this.getPosition()[0], this.getPosition()[1]});
@@ -115,6 +115,13 @@ private int modifiedDefense;
         }
     }
 
+    public boolean checkForItem(String name) {
+        for (Item item: inventory) {
+            if(item.getName().equals(name)) return true;
+        }
+        return false;
+    }
+
     public Item[] getInventory() {
         return inventory;
     }
@@ -129,6 +136,7 @@ private int modifiedDefense;
 
     @Override
     void loseHealth(int dmg) {
-        setCurrHealth(getCurrHealth() + getModifiedDefense() <= dmg ? 0 : getCurrHealth() + getDefense() - dmg);
+        setCurrHealth(getCurrHealth() + getModifiedDefense() <= dmg ? 0 : getCurrHealth() + getModifiedDefense() - dmg);
+
     }
 }

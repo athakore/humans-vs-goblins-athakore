@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Random;
 
 public class Board {
@@ -9,7 +10,7 @@ public class Board {
     private String playerToken = "\uD83D\uDC78";
     private String enemyToken = "\uD83D\uDC7F";
     private String lootToken = "\uD83D\uDCB0";
-    private boolean isDead = false;
+    boolean isDead = false;
 
     public Board(){
         board = new String[][]{
@@ -203,17 +204,17 @@ public class Board {
 
     Item generateItem (int[] pos) {
         int temp = new Random().nextInt(100) + 1;
-        if(temp > 1 && temp <= 21) temp = 2;
-        else if(temp > 21 && temp <= 41) temp = 3;
-        else if(temp > 41 && temp <= 61) temp = 4;
-        else if(temp > 61 && temp <= 76) temp = 5;
-        else if(temp > 76 && temp <= 91) temp = 6;
-        else if(temp > 91 && temp <= 99) temp = 7;
+        if(temp > 1 && temp <= 41) temp = 2;
+        else if(temp > 41 && temp <= 56) temp = 3;
+        else if(temp > 56 && temp <= 71) temp = 4;
+        else if(temp > 71 && temp <= 82) temp = 5;
+        else if(temp > 82 && temp <= 93) temp = 6;
+        else if(temp > 93 && temp <= 99) temp = 7;
         else if(temp == 100) temp = 8;
         switch(temp) {
-            case 1:
-                return new Item("WTF",ItemType.shield,0,4,0,pos); //Weapon Termination Field
-            case 2:
+            case 1, 2, 3:
+                return new Item("WTF",ItemType.shield,0,5,0,pos); //Weapon Termination Field
+            /*case 2:
                 return new Item("PTN",ItemType.consumable,0,0,5,pos); //Potion
             case 3:
                 return new Item("DAG",ItemType.weapon,1,0,0,pos); //Dagger
@@ -224,8 +225,8 @@ public class Board {
             case 6:
                 return new Item("SHD",ItemType.shield,0,2,0,pos); //Shield
             case 7:
-                return new Item("RAP",ItemType.weapon,2,1,0,pos); //Rapier
-            case 8:
+                return new Item("RAP",ItemType.weapon,2,1,0,pos); //Rapier*/
+            case 4, 5, 6, 7, 8:
                 return new Item("FFS",ItemType.weapon,6,0,0,pos); //Final Fantasy Sword
             default:
                 return new Item();
@@ -236,8 +237,14 @@ public class Board {
     void resolveMove() {
         if(checkForCombat()) {
             resolveCombat();
+            enemy.setNextPosition(new int[]{enemy.getPosition()[0], enemy.getPosition()[1]});
+            player.setNextPosition(new int[]{player.getPosition()[0], player.getPosition()[1]});
         }
         else {
+            if(checkForLoot()) {
+                loot.setPosition(new int[]{-1, -1});
+                player.pickUpItem(new Item(loot));
+            }
             enemy.setPosition(new int[]{enemy.getNextPosition()[0], enemy.getNextPosition()[1]});
             player.setPosition(new int[]{player.getNextPosition()[0], player.getNextPosition()[1]});
         }
@@ -246,20 +253,31 @@ public class Board {
     void resolveCombat() {
         enemy.loseHealth(player.getModifiedPower());
         player.loseHealth(enemy.getPower());
+        if(player.getCurrHealth() == 0){
+            isDead = true;
+            player.setPosition(new int[]{-1, -1});
+            return;
+        }
         if(enemy.getCurrHealth() == 0) {
             loot = generateItem(enemy.getPosition());
+            score += 100;
             enemy = new Goblin();
             Random rand = new Random();
             int[] temp = new int[2];
             do{
-                temp = new int[]{rand.nextInt(5), rand.nextInt(10)};
+                temp = new int[]{rand.nextInt(10), rand.nextInt(5)};
             } while(temp == player.getPosition() || temp == loot.getPosition());
             enemy.setPosition(temp);
         }
     }
 
     boolean checkForCombat() {
-        if(player.getNextPosition() == enemy.getNextPosition() || (player.getNextPosition() == enemy.getPosition() && enemy.getNextPosition() == player.getPosition())) return true;
+        if(Arrays.equals(player.getNextPosition(), enemy.getNextPosition()) || (Arrays.equals(player.getNextPosition(), enemy.getPosition()) && Arrays.equals(enemy.getNextPosition(), player.getPosition()))) return true;
+        else return false;
+    }
+
+    boolean checkForLoot() {
+        if(Arrays.equals(player.getNextPosition(), loot.getPosition())) return true;
         else return false;
     }
 }

@@ -13,12 +13,17 @@ public class Main {
         //Treasure: 💰
         Scanner input = new Scanner(System.in);
         Board test = new Board();
-        while(true){
+        do {
             test.updateBoard();
             test.printBoard();
             test.enemyMove();
-            test.playerMove(input.next());
+            boolean temp = false;
+            do {
+                temp = test.playerMove(input.next());
+            }while (!temp);
             test.resolveMove();
-        }
+        }while(!test.isDead);
+        test.printBoard();
+        System.out.printf("Game Over");
     }
 }

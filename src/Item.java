@@ -24,6 +24,15 @@ public class Item {
         this.position = position;
     }
 
+    public Item(Item item) {
+        this.name = item.name;
+        this.type = item.type;
+        this.power = item.power;
+        this.defense = item.defense;
+        this.health = item.health;
+        this.position = item.position;
+    }
+
     public String getName() {
         return name;
     }
