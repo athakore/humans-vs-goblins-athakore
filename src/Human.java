@@ -53,7 +53,7 @@ private int modifiedDefense;
         else {
             System.out.println(String.format(
             """
-            You already have a %s. Would you like to replace it? (Y or N)
+            You already have a %s.
             Current:  Replace:
             -----     -----
             |%s|     |%s|
@@ -68,10 +68,24 @@ private int modifiedDefense;
                     i.getPower(),
                     inventory[temp].getDefense(),
                     i.getDefense()));
-            if(new Scanner(System.in).next().equalsIgnoreCase("Y")) {
-                inventory[temp] = i;
-                updateStats();
-            }
+            boolean isValid = false;
+            do{
+                System.out.println("Would you like to replace it? (Y or N)");
+                switch(new Scanner(System.in).next().toUpperCase()) {
+                    case "Y":
+                        isValid = true;
+                        inventory[temp] = i;
+                        break;
+                    case "N":
+                        isValid = true;
+                        break;
+                    default:
+                        System.out.println("That's not a valid input, try again.");
+                        isValid = false;
+                        break;
+                }
+            }while(!isValid);
+            updateStats();
         }
     }
 
@@ -136,7 +150,8 @@ private int modifiedDefense;
 
     @Override
     void loseHealth(int dmg) {
-        setCurrHealth(getCurrHealth() + getModifiedDefense() <= dmg ? 0 : getCurrHealth() + getModifiedDefense() - dmg);
+        if(checkForItem("WTF")) setCurrHealth(getCurrHealth() - 1);
+        else setCurrHealth(getCurrHealth() + getModifiedDefense() <= dmg ? 0 : getCurrHealth() + getModifiedDefense() - dmg);
 
     }
 }

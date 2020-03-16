@@ -30,7 +30,7 @@ public class Main {
                         isDone  = true;
                         break;
                     default:
-                        System.out.println("That's not a valid input, try again. (Y or N)");
+                        System.out.println("That's not a valid input, try again.");
                         isValid = false;
                 }
             }while(!isValid);

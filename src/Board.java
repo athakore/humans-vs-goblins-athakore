@@ -77,28 +77,43 @@ public class Board {
 
     void printBoard() {
         String scoreString;
-         switch(winCount) {
-            case 0:
-                scoreString = Integer.toString(score);
-                break;
+        switch(winCount) {
             default:
                 scoreString = Integer.toString(score);
                 break;
             case 1:
-                scoreString = Integer.toString(score) + " \"...WAIT, DID YOU JUST ONE-SHOT A GOBLIN HEAL FROM COMBAT? HOW DOES THAT EVEN WORK???\"";
+                scoreString = Integer.toString(score) + " \"...WAIT, DID YOU JUST ONE-SHOT A GOBLIN AND HEAL FROM COMBAT? HOW DOES THAT EVEN WORK???\"";
                 break;
-             case 2:
+            case 2:
                 scoreString = Integer.toString(score) + " \"...OH, YOU'RE STILL PLAYING...WHY? IT'S NOT LIKE YOU CAN LOSE ANYMORE.\"";
                 break;
-             case 3:
-                scoreString = "\"LOOK, YOU DON'T EVEN HAVE A SCORE, ANYMORE. JUST TURN OFF THE GAME AND WALK AWAY\"";
+            case 3:
+                scoreString = "\"LOOK, YOU DON'T EVEN HAVE A SCORE, ANYMORE! JUST TURN OFF THE GAME AND WALK AWAY.\"";
                 break;
-             case 4:
+            case 4:
                  scoreString = "\"STOP! PLAYING!\"";
                  break;
-             case 5:
+            case 5:
                  scoreString ="INFINITY";
                  break;
+        }
+        String finalFantasySword;
+        String weaponTerminationField;
+        if(player.checkForItem("FFS") && !player.checkForItem("WTF")) {
+            finalFantasySword = "FFS => Final Fantasy Sword(Increases power by 5.̶͚́.̴̛̥̰͑.̷̱̝̑̇̊)̶͕̉̐̀";
+            weaponTerminationField = "???";
+        }
+        else if(!player.checkForItem("FFS") && player.checkForItem("WTF")) {
+            finalFantasySword = "???";
+            weaponTerminationField = "WTF => Weapon Termination Field(Reduces all damage to 1.̷̧̧̛̀͘.̷̪̉͆́.̶̪̂̈́ͅ)̴̢̙̎͛͝";
+        }
+        else if(player.checkForItem("FFS") && player.checkForItem("WTF")){
+            finalFantasySword = "FFS => Final Fantasy Sword(Kills all enemies in one shot...Wait, WHAT?!?!)";
+            weaponTerminationField = "WTF => Weapon Termination Field(Heals 5 health every time you are hit...SERIOUSLY, WHO PUT THIS IN HERE?!?!)";
+        }
+        else {
+            finalFantasySword = "???";
+            weaponTerminationField = "???";
         }
         System.out.println(String.format("""
                 Score: %s
@@ -114,7 +129,7 @@ public class Board {
                 | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |             DAG => Dagger(Increases power by 1)
                 ---------------------------------------------------             BKL => Buckler(Increases defense by 1)
                 Health: %s / %s | Power: %s | Defense: %s                        %s%sSWD => Sword(Increases power by 3)
-                Enemy:  %s / %s                                                 SHD => Shield(Increases defense by 2)
+                Goblin: %s / %s | Power: %s | Defense: %s                         %sSHD => Shield(Increases defense by 2)
                 Inventory:                                                      RAP => Rapier(Increases power by 2 & defense by 1)
                     ---------------------                                       %s
                     |%s|%s|%s|%s|%s|                                       %s
@@ -179,13 +194,16 @@ public class Board {
                 player.getModifiedPower() > 9 ? "" : " ",
                 enemy.getCurrHealth(),
                 enemy.getMaxHealth(),
-                player.checkForItem("FFS") ? "FFS => Final Fantasy Sword(Increases power by 6...Wait, WHAT!?!?)" : "???",
+                enemy.getPower(),
+                enemy.getDefense(),
+                enemy.getCurrHealth() > 9 ? "" : " ",
+                finalFantasySword,
                 player.getInventory()[0] == null ? "   " : player.getInventory()[0],
                 player.getInventory()[1] == null ? "   " : player.getInventory()[1],
                 player.getInventory()[2] == null ? "   " : player.getInventory()[2],
                 player.getInventory()[3] == null ? "   " : player.getInventory()[3],
                 player.getInventory()[4] == null ? "   " : player.getInventory()[4],
-                player.checkForItem("WTF") ? "WTF => Weapon Termination Field(Heals 5 health every time you are hit...Seriously, WHO PUT THIS IN HERE?!?!)" : "???"
+                weaponTerminationField
                 ));
     }
 
@@ -268,12 +286,12 @@ public class Board {
         else if(temp == 100) temp = 8;
         switch(temp) {
             //Easter Egg Mode
-            /*case 1, 2, 3:
+            case 1, 2, 3:
                 return new Item("WTF",ItemType.shield,0,5,0,pos); //Weapon Termination Field
             case 4, 5, 6, 7, 8:
-                return new Item("FFS",ItemType.weapon,6,0,0,pos); //Final Fantasy Sword*/
+                return new Item("FFS",ItemType.weapon,5,0,0,pos); //Final Fantasy Sword
             //Normal Mode
-            case 1:
+            /*case 1:
                 return new Item("WTF",ItemType.shield,0,5,0,pos); //Weapon Termination Field
             case 2:
                 return new Item("PTN",ItemType.consumable,0,0,5,pos); //Potion
@@ -286,9 +304,9 @@ public class Board {
             case 6:
                 return new Item("SHD",ItemType.shield,0,2,0,pos); //Shield
             case 7:
-                return new Item("RAP",ItemType.weapon,2,1,0,pos); //Rapier*/
+                return new Item("RAP",ItemType.weapon,2,1,0,pos); //Rapier
             case 8:
-                return new Item("FFS",ItemType.weapon,6,0,0,pos); //Final Fantasy Sword
+                return new Item("FFS",ItemType.weapon,5,0,0,pos); //Final Fantasy Sword*/
             default:
                 return new Item();
 
@@ -312,7 +330,8 @@ public class Board {
     }
 
     void resolveCombat() {
-        enemy.loseHealth(player.getModifiedPower());
+        if(player.checkForItem("FFS") && player.checkForItem("WTF")) enemy.loseHealth(enemy.getCurrHealth() + enemy.getDefense());
+        else enemy.loseHealth(player.getModifiedPower());
         player.loseHealth(enemy.getPower());
         if(player.getCurrHealth() == 0){
             isDead = true;
@@ -356,6 +375,6 @@ public class Board {
             resolveMove();
         }while(!isDead && winCount < 5);
         printBoard();
-        System.out.println(winCount == 5 ? "\"YOU KNOW WHAT? FORGET THIS. CONGRATULATIONS, YOU WON. BYE!\"" : "Game Over");
+        System.out.println(winCount == 5 ? "\"YOU KNOW WHAT? FORGET THIS. CONGRATULATIONS, YOU WIN. NOW GET OUT OF HERE!\"" : "Game Over");
     }
 }
