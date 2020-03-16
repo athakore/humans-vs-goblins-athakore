@@ -5,8 +5,8 @@ private Item[] inventory = new Item[5];
 private int modifiedPower;
 private int modifiedDefense;
     public Human(){
-        this.setMaxHealth(25);
-        this.setCurrHealth(25);
+        this.setMaxHealth(50);
+        this.setCurrHealth(50);
         this.setPower(5);
         this.modifiedPower = getPower();
         this.setDefense(0);
@@ -117,7 +117,7 @@ private int modifiedDefense;
 
     public boolean checkForItem(String name) {
         for (Item item: inventory) {
-            if(item.getName().equals(name)) return true;
+            if(item != null && item.getName().equals(name)) return true;
         }
         return false;
     }

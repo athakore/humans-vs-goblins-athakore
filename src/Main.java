@@ -11,19 +11,29 @@ public class Main {
         //Goblin: 👿
         //Human:
         //Treasure: 💰
-        Scanner input = new Scanner(System.in);
-        Board test = new Board();
-        do {
-            test.updateBoard();
-            test.printBoard();
-            test.enemyMove();
-            boolean temp = false;
-            do {
-                temp = test.playerMove(input.next());
-            }while (!temp);
-            test.resolveMove();
-        }while(!test.isDead);
-        test.printBoard();
-        System.out.printf("Game Over");
+        Scanner in = new Scanner(System.in);
+        Board board = new Board();
+        boolean isDone = false;
+        do{
+            board.initializeBoard();
+            board.playGame();
+            boolean isValid = false;
+            do{
+                System.out.println("Would you like to play again? (Y or N)");
+                switch (in.next().toUpperCase()) {
+                    case "Y":
+                        isValid = true;
+                        isDone = false;
+                        break;
+                    case "N":
+                        isValid = true;
+                        isDone  = true;
+                        break;
+                    default:
+                        System.out.println("That's not a valid input, try again. (Y or N)");
+                        isValid = false;
+                }
+            }while(!isValid);
+        }while(!isDone);
     }
 }

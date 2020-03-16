@@ -1,16 +1,18 @@
 import java.util.Arrays;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Board {
     private String[][] board;
     public Human player;
     private Goblin enemy;
     private Item loot;
-    private int score;
+    private int score = 0;
     private String playerToken = "\uD83D\uDC78";
     private String enemyToken = "\uD83D\uDC7F";
     private String lootToken = "\uD83D\uDCB0";
     boolean isDead = false;
+    int winCount = 0;
 
     public Board(){
         board = new String[][]{
@@ -30,6 +32,7 @@ public class Board {
         loot = new Item("DAG", ItemType.weapon, 1, 0, 0, new int[]{-1, -1});
         score = 0;
         isDead = false;
+        winCount = 0;
     }
 
     void initiateMove(Actor actor, String dir) {
@@ -51,7 +54,52 @@ public class Board {
         }
     };
 
+    void initializeBoard() {
+        board = new String[][]{
+            {" ", " ", " ", " ", " "},
+            {" ", " ", " ", " ", " "},
+            {" ", " ", " ", " ", " "},
+            {" ", " ", " ", " ", " "},
+            {" ", " ", " ", " ", " "},
+            {" ", " ", " ", " ", " "},
+            {" ", " ", " ", " ", " "},
+            {" ", " ", " ", " ", " "},
+            {" ", " ", " ", " ", " "},
+            {" ", " ", " ", " ", " "}
+    };
+        player = new Human();
+        enemy = new Goblin();
+        loot = new Item("DAG", ItemType.weapon, 1, 0, 0, new int[]{-1, -1});
+        score = 0;
+        isDead = false;
+        winCount = 0;
+    }
+
     void printBoard() {
+        String scoreString;
+         switch(winCount) {
+            case 0:
+                scoreString = Integer.toString(score);
+                break;
+            default:
+                scoreString = Integer.toString(score);
+                break;
+            case 1:
+                scoreString = Integer.toString(score) + " \"...WAIT, DID YOU JUST ONE-SHOT A GOBLIN HEAL FROM COMBAT? HOW DOES THAT EVEN WORK???\"";
+                break;
+             case 2:
+                scoreString = Integer.toString(score) + " \"...OH, YOU'RE STILL PLAYING...WHY? IT'S NOT LIKE YOU CAN LOSE ANYMORE.\"";
+                break;
+             case 3:
+                scoreString = "\"LOOK, YOU DON'T EVEN HAVE A SCORE, ANYMORE. JUST TURN OFF THE GAME AND WALK AWAY\"";
+                break;
+             case 4:
+                 scoreString = "\"STOP! PLAYING!\"";
+                 break;
+             case 5:
+                 scoreString ="INFINITY";
+                 break;
+        }
         System.out.println(String.format("""
                 Score: %s
                 ---------------------------------------------------         Controls:
@@ -65,13 +113,14 @@ public class Board {
                 ---------------------------------------------------             PTN => Potion(Heals 5 health)
                 | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |             DAG => Dagger(Increases power by 1)
                 ---------------------------------------------------             BKL => Buckler(Increases defense by 1)
-                Health: %s / %s | Power: %s | Defense: %s                         SWD => Sword(Increases power by 3)
-                Inventory:                                                      SHD => Shield(Increases defense by 2)
-                    ---------------------                                       RAP => Rapier(Increases power by 2 & defense by 1)
-                    |%s|%s|%s|%s|%s|
+                Health: %s / %s | Power: %s | Defense: %s                        %s%sSWD => Sword(Increases power by 3)
+                Enemy:  %s / %s                                                 SHD => Shield(Increases defense by 2)
+                Inventory:                                                      RAP => Rapier(Increases power by 2 & defense by 1)
+                    ---------------------                                       %s
+                    |%s|%s|%s|%s|%s|                                       %s
                     ---------------------
                 """,
-                Integer.toString(score),
+                scoreString,
                 board[0][4] == " " ? "  " : board[0][4],
                 board[1][4] == " " ? "  " : board[1][4],
                 board[2][4] == " " ? "  " : board[2][4],
@@ -126,11 +175,17 @@ public class Board {
                 player.getMaxHealth(),
                 player.getModifiedPower(),
                 player.getModifiedDefense(),
+                player.getCurrHealth() > 9 ? "" : " ",
+                player.getModifiedPower() > 9 ? "" : " ",
+                enemy.getCurrHealth(),
+                enemy.getMaxHealth(),
+                player.checkForItem("FFS") ? "FFS => Final Fantasy Sword(Increases power by 6...Wait, WHAT!?!?)" : "???",
                 player.getInventory()[0] == null ? "   " : player.getInventory()[0],
                 player.getInventory()[1] == null ? "   " : player.getInventory()[1],
                 player.getInventory()[2] == null ? "   " : player.getInventory()[2],
                 player.getInventory()[3] == null ? "   " : player.getInventory()[3],
-                player.getInventory()[4] == null ? "   " : player.getInventory()[4]
+                player.getInventory()[4] == null ? "   " : player.getInventory()[4],
+                player.checkForItem("WTF") ? "WTF => Weapon Termination Field(Heals 5 health every time you are hit...Seriously, WHO PUT THIS IN HERE?!?!)" : "???"
                 ));
     }
 
@@ -212,9 +267,15 @@ public class Board {
         else if(temp > 93 && temp <= 99) temp = 7;
         else if(temp == 100) temp = 8;
         switch(temp) {
-            case 1, 2, 3:
+            //Easter Egg Mode
+            /*case 1, 2, 3:
                 return new Item("WTF",ItemType.shield,0,5,0,pos); //Weapon Termination Field
-            /*case 2:
+            case 4, 5, 6, 7, 8:
+                return new Item("FFS",ItemType.weapon,6,0,0,pos); //Final Fantasy Sword*/
+            //Normal Mode
+            case 1:
+                return new Item("WTF",ItemType.shield,0,5,0,pos); //Weapon Termination Field
+            case 2:
                 return new Item("PTN",ItemType.consumable,0,0,5,pos); //Potion
             case 3:
                 return new Item("DAG",ItemType.weapon,1,0,0,pos); //Dagger
@@ -226,7 +287,7 @@ public class Board {
                 return new Item("SHD",ItemType.shield,0,2,0,pos); //Shield
             case 7:
                 return new Item("RAP",ItemType.weapon,2,1,0,pos); //Rapier*/
-            case 4, 5, 6, 7, 8:
+            case 8:
                 return new Item("FFS",ItemType.weapon,6,0,0,pos); //Final Fantasy Sword
             default:
                 return new Item();
@@ -259,6 +320,7 @@ public class Board {
             return;
         }
         if(enemy.getCurrHealth() == 0) {
+            if(player.checkForItem("FFS") && player.checkForItem("WTF")) winCount++;
             loot = generateItem(enemy.getPosition());
             score += 100;
             enemy = new Goblin();
@@ -279,5 +341,21 @@ public class Board {
     boolean checkForLoot() {
         if(Arrays.equals(player.getNextPosition(), loot.getPosition())) return true;
         else return false;
+    }
+
+    void playGame() {
+        Scanner input = new Scanner(System.in);
+        do {
+            updateBoard();
+            printBoard();
+            enemyMove();
+            boolean temp = false;
+            do {
+                temp = playerMove(input.next());
+            }while (!temp);
+            resolveMove();
+        }while(!isDead && winCount < 5);
+        printBoard();
+        System.out.println(winCount == 5 ? "\"YOU KNOW WHAT? FORGET THIS. CONGRATULATIONS, YOU WON. BYE!\"" : "Game Over");
     }
 }
