@@ -286,12 +286,12 @@ public class Board {
         else if(temp == 100) temp = 8;
         switch(temp) {
             //Easter Egg Mode
-            case 1, 2, 3:
+            /*case 1, 2, 3:
                 return new Item("WTF",ItemType.shield,0,5,0,pos); //Weapon Termination Field
             case 4, 5, 6, 7, 8:
-                return new Item("FFS",ItemType.weapon,5,0,0,pos); //Final Fantasy Sword
+                return new Item("FFS",ItemType.weapon,5,0,0,pos); //Final Fantasy Sword*/
             //Normal Mode
-            /*case 1:
+            case 1:
                 return new Item("WTF",ItemType.shield,0,5,0,pos); //Weapon Termination Field
             case 2:
                 return new Item("PTN",ItemType.consumable,0,0,5,pos); //Potion
@@ -300,13 +300,13 @@ public class Board {
             case 4:
                 return new Item("BKL",ItemType.shield,0,1,0,pos); //Buckler
             case 5:
-                return new Item("SWD",ItemType.weapon,2,0,0,pos); //Sword
+                return new Item("SWD",ItemType.weapon,3,0,0,pos); //Sword
             case 6:
                 return new Item("SHD",ItemType.shield,0,2,0,pos); //Shield
             case 7:
                 return new Item("RAP",ItemType.weapon,2,1,0,pos); //Rapier
             case 8:
-                return new Item("FFS",ItemType.weapon,5,0,0,pos); //Final Fantasy Sword*/
+                return new Item("FFS",ItemType.weapon,5,0,0,pos); //Final Fantasy Sword
             default:
                 return new Item();
 
@@ -347,7 +347,7 @@ public class Board {
             int[] temp = new int[2];
             do{
                 temp = new int[]{rand.nextInt(10), rand.nextInt(5)};
-            } while(temp == player.getPosition() || temp == loot.getPosition());
+            } while((Math.abs((temp[0] + temp[1]) - (player.getPosition()[0] + player.getPosition()[1])) < 4));
             enemy.setPosition(temp);
         }
     }
